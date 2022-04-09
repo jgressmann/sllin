@@ -28,8 +28,8 @@ git submodule update --init --depth 1 --recursive
 env
 
 # Save current commit
-mkdir -p $TARGET_DIR/supercan
-echo $APPVEYOR_REPO_COMMIT >$TARGET_DIR/supercan/COMMIT
+mkdir -p $TARGET_DIR/sllin
+echo $APPVEYOR_REPO_COMMIT >$TARGET_DIR/sllin/COMMIT
 
 ############
 # D5035-02 #
@@ -39,7 +39,7 @@ export BOARD=d5035_02
 
 # make output dirs for hw revs
 for i in $hw_revs; do
-	mkdir -p $TARGET_DIR/supercan/$BOARD/0$i
+	mkdir -p $TARGET_DIR/sllin/$BOARD/0$i
 done
 
 
@@ -51,32 +51,32 @@ cd $APPVEYOR_BUILD_FOLDER/Boards/examples/device/${project}
 
 for i in $hw_revs; do
 	make $MAKE_ARGS BOARD=$BOARD BOOTLOADER=1 VID=$VID PID=$PID_DFU PRODUCT_NAME="$BOOTLOADER_NAME" INTERFACE_NAME="$BOOTLOADER_NAME" HWREV=$i
-	cp _build/$BOARD/${project}.hex $TARGET_DIR/supercan/$BOARD/0$i/superdfu.hex
-	cp _build/$BOARD/${project}.bin $TARGET_DIR/supercan/$BOARD/0$i/superdfu.bin
+	cp _build/$BOARD/${project}.hex $TARGET_DIR/sllin/$BOARD/0$i/superdfu.hex
+	cp _build/$BOARD/${project}.bin $TARGET_DIR/sllin/$BOARD/0$i/superdfu.bin
 	rm -rf _build
 	make $MAKE_ARGS BOARD=$BOARD BOOTLOADER=1 VID=$VID PID=$PID_DFU PRODUCT_NAME="$BOOTLOADER_NAME" INTERFACE_NAME="$BOOTLOADER_NAME" HWREV=$i APP=1 dfu
-	cp _build/$BOARD/${project}.dfu $TARGET_DIR/supercan/$BOARD/0$i/superdfu.dfu
+	cp _build/$BOARD/${project}.dfu $TARGET_DIR/sllin/$BOARD/0$i/superdfu.dfu
 	rm -rf _build
 done
 
 # sllin
-project=supercan
+project=sllin
 cd $APPVEYOR_BUILD_FOLDER/Boards/examples/device/${project}
 
 
 for i in $hw_revs; do
 	make $MAKE_ARGS HWREV=$i
-	cp _build/$BOARD/${project}.hex $TARGET_DIR/supercan/$BOARD/0$i/supercan-standalone.hex
-	cp _build/$BOARD/${project}.bin $TARGET_DIR/supercan/$BOARD/0$i/supercan-standalone.bin
+	cp _build/$BOARD/${project}.hex $TARGET_DIR/sllin/$BOARD/0$i/sllin-standalone.hex
+	cp _build/$BOARD/${project}.bin $TARGET_DIR/sllin/$BOARD/0$i/sllin-standalone.bin
 	rm -rf _build
 	make $MAKE_ARGS HWREV=$i APP=1 dfu
-	cp _build/$BOARD/${project}.superdfu.hex $TARGET_DIR/supercan/$BOARD/0$i/supercan-dfu.hex
-	cp _build/$BOARD/${project}.superdfu.bin $TARGET_DIR/supercan/$BOARD/0$i/supercan-dfu.bin
-	cp _build/$BOARD/${project}.dfu $TARGET_DIR/supercan/$BOARD/0$i/supercan.dfu
+	cp _build/$BOARD/${project}.superdfu.hex $TARGET_DIR/sllin/$BOARD/0$i/sllin-dfu.hex
+	cp _build/$BOARD/${project}.superdfu.bin $TARGET_DIR/sllin/$BOARD/0$i/sllin-dfu.bin
+	cp _build/$BOARD/${project}.dfu $TARGET_DIR/sllin/$BOARD/0$i/sllin.dfu
 	rm -rf _build
 done
 unset hw_revs
 
 # archive
-cd $TARGET_DIR && (tar c supercan | pixz -9 >supercan-firmware.tar.xz)
+cd $TARGET_DIR && (tar c sllin | pixz -9 >sllin-firmware.tar.xz)
 
