@@ -1,0 +1,3 @@
+[submodule "Boards"]
+	path = Boards
+	url = https://github.com/jgressmann/tinyusb.git
