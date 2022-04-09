@@ -1,14 +1,14 @@
 image: Ubuntu2004
 branches:
   only:
-    - master
+    - main
 
 # set clone depth
 clone_depth: 1
 
 # environment variables
 environment:
-  ARCHIVE_FILE: tmp/supercan-firmware.tar.xz
+  ARCHIVE_FILE: tmp/sllin-firmware.tar.xz
 
 build_script:
   - chmod +x $APPVEYOR_BUILD_FOLDER/appveyor/firmware.sh && $APPVEYOR_BUILD_FOLDER/appveyor/firmware.sh
@@ -19,8 +19,8 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    release: latest-master
-    description: 'Builds SuperCAN firmware from latest master sources'
+    release: latest-main
+    description: 'Builds slLIN firmware from latest main sources'
     artifact: files
     draft: false
     prerelease: true
@@ -28,11 +28,11 @@ deploy:
     auth_token:
       secure: K/HQrOXWX8zskwhGF/Uvxw/bdu0iDcZ0lBy1NgYBJiGkzQS49OqXGp3XGEoh12BS
     on:
-      branch: master                # release from master branch only
+      branch: main                # release from main branch only
 
   - provider: GitHub
     release: $(APPVEYOR_REPO_TAG_NAME)
-    description: 'SuperCAN $(APPVEYOR_REPO_TAG_NAME)'
+    description: 'slLIN $(APPVEYOR_REPO_TAG_NAME)'
     artifact: files
     draft: true
     prerelease: false
