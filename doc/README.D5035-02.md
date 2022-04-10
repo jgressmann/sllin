@@ -1,5 +1,5 @@
 
-# D5035-02 Firmware Update
+# D5035-50 Firmware Update
 
 This assumes you have a board with the SuperDFU bootloader already installed. If not, see below on how to build & flash the bootloader.
 
@@ -13,26 +13,24 @@ Ensure you have `dfu-util` available on your system. Windows users can [download
 
 #### slLIN
 ```
-sudo dfu-util -d 1d50:5035,:5036 -R -D sllin.dfu
+sudo dfu-util -d 1d50:5037,:5038 -R -D sllin.dfu
 ```
 
 #### SuperDFU
 
-Since version 0.3.3, the bootloader can be updated through DFU. Earlier versions require a debug probe (see below).
-
 ```
-sudo dfu-util -d 1d50:5035,:5036 -R -D superdfu.dfu
+sudo dfu-util -d 1d50:5037,:5038 -R -D superdfu.dfu
 ```
 
 _NOTE: You likely need to re-flash the CAN application once the bootloader has been updated._
 
 ### Windows
 
-Please follow [these steps](../Windows/README.D5035-02.firmware.flashing.md).
+Please follow [these steps](../Windows/README.D5035-50.firmware.flashing.md).
 
 # Building
 
-This section describes the steps to build the software in a Linux-like environment. Windows users should read [this](../Windows/README.D5035-02.firmware.building.md).
+This section describes the steps to build the software in a Linux-like environment. Windows users should read [this](../Windows/README.D5035-50.firmware.building.md).
 
 ## Setup
 
@@ -65,13 +63,13 @@ If you have a debugger probe such as SEGGER's J-Link you can choose any option. 
 #### J-Link
 ```
 $ cd Boards/examples/device/sllin
-$ make -j V=1 BOARD=d5035_02 HWREV=1 flash-jlink
+$ make -j V=1 BOARD=d5035_50 HWREV=1 flash-jlink
 ```
 
 #### Atmel ICE
 ```
 $ cd Boards/examples/device/sllin
-$ make -j V=1 BOARD=d5035_02 HWREV=1 flash-edbg
+$ make -j V=1 BOARD=d5035_50 HWREV=1 flash-edbg
 ```
 
 
@@ -92,14 +90,14 @@ This option installs the SuperDFU  bootloader on the device. SuperDFU implements
 
 ```
 $ cd Boards/examples/device/atsame51_dfu
-$ make -j V=1 BOARD=d5035_02 HWREV=1 BOOTLOADER=1 VID=0x1d50 PID=0x5036 PRODUCT_NAME="D5035-02 slLIN DFU" INTERFACE_NAME="D5035-02 slLIN DFU" flash-jlink
+$ make -j V=1 BOARD=d5035_50 HWREV=1 BOOTLOADER=1 VID=0x1d50 PID=0x5038 PRODUCT_NAME="D5035-50 slLIN DFU" INTERFACE_NAME="D5035-50 slLIN DFU" flash-jlink
 ```
 
 ##### Atmel ICE
 
 ```
 $ cd Boards/examples/device/atsame51_dfu
-$ make -j V=1 BOARD=d5035_02 HWREV=1 BOOTLOADER=1 VID=0x1d50 PID=0x5036 PRODUCT_NAME="D5035-02 slLIN DFU" INTERFACE_NAME="D5035-02 slLIN DFU" flash-edbg
+$ make -j V=1 BOARD=d5035_50 HWREV=1 BOOTLOADER=1 VID=0x1d50 PID=0x5038 PRODUCT_NAME="D5035-50 slLIN DFU" INTERFACE_NAME="D5035-50 slLIN DFU" flash-edbg
 ```
 
 This creates and flashes the bootloader. Make sure to replace _HWREV=1_ with the revision of the board you are using.
@@ -110,7 +108,7 @@ Next, flash slLIN using these steps
 
 ```
 $ cd Boards/examples/device/sllin
-$ make -j V=1 BOARD=d5035_02 HWREV=1 APP=1 flash-dfu
+$ make -j V=1 BOARD=d5035_50 HWREV=1 APP=1 flash-dfu
 ```
 
 
@@ -118,7 +116,7 @@ $ make -j V=1 BOARD=d5035_02 HWREV=1 APP=1 flash-dfu
 
 ```
 $ cd Boards/examples/device/sllin
-$ make -j V=1 BOARD=d5035_02 HWREV=1 APP=1 OFFSET=0x4000 edbg-dfu
+$ make -j V=1 BOARD=d5035_50 HWREV=1 APP=1 OFFSET=0x4000 edbg-dfu
 ```
 ### 3. Build and upload slLIN through SuperDFU
 
@@ -132,7 +130,7 @@ Build the slLIN DFU file
 
 ```
 $ cd Boards/examples/device/sllin
-$ make -j V=1 BOARD=d5035_02 HWREV=1 APP=1 dfu
+$ make -j V=1 BOARD=d5035_50 HWREV=1 APP=1 dfu
 ```
 
 Ensure _HWREV_ matches the board you are using.

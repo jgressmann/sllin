@@ -14,7 +14,7 @@ export VID=0x1d50
 export PID_RT=0x5037
 export PID_DFU=0x5038
 export MAKE_ARGS="-j V=1"
-export BOOTLOADER_NAME="D5035-02 slLIN DFU"
+export BOOTLOADER_NAME="D5035-50 slLIN DFU"
 export TARGET_DIR=$APPVEYOR_BUILD_FOLDER/tmp
 
 
@@ -32,10 +32,10 @@ mkdir -p $TARGET_DIR/sllin
 echo $APPVEYOR_REPO_COMMIT >$TARGET_DIR/sllin/COMMIT
 
 ############
-# D5035-02 #
+# D5035-50 #
 ############
 hw_revs=1
-export BOARD=d5035_02
+export BOARD=d5035_50
 
 # make output dirs for hw revs
 for i in $hw_revs; do

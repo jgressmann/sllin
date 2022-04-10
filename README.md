@@ -21,7 +21,7 @@ Have a look [here](doc/README.devices.rst).
 
 ## Supported Operating Systems
 
-slLIN devices appear as serial ports on the host system. Here is the link to the [protocol description](Boards/examples/device/sllin/README.md).
+slLIN devices appear as serial ports on the host system. Here is the link to the [protocol description](https://github.com/jgressmann/tinyusb/blob/master/examples/device/sllin/README.md).
 
 # License
 
