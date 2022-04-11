@@ -138,5 +138,5 @@ Ensure _HWREV_ matches the board you are using.
 Next, upload the DFU file to the board.
 ```
 $ cd Boards/examples/device/sllin
-$ sudo dfu-util -R -D _build/build-d5035-01/d5035-01-firmware.dfu
+$ sudo dfu-util -R -D _build/d5035_50/sllin.dfu
 ```
