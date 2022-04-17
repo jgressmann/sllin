@@ -1,0 +1,6 @@
+ExitOnError 1
+r
+loadfile /home/jean/superdfu.bin
+r
+go
+exit
