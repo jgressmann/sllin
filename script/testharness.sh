@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# set -e
+set -e
 #set -x
 
 script_dir=$(dirname $0)
@@ -151,7 +151,7 @@ test_cleanup()
 	for (( i=0; i<${#pids[@]}; i++ )); do
 		local pid=${pids[$i]}
 
-		kill -9 $pid 1>/dev/null 2>&1
+		kill -9 $pid 1>/dev/null 2>&1 || true
 	done
 }
 
@@ -159,6 +159,7 @@ test_error_cleanup()
 {
 	local last=$_
 	local rc=$?
+
 	if [ 0 -ne $rc ]; then
 		echo ERROR: command $last failed with $rc
 	fi
@@ -212,16 +213,37 @@ spawn_master()
 	spawn $1 -o master
 }
 
-export -f spawn_master spawn_slave spawn test_error_cleanup test_cleanup
+same_messages()
+{
+	#local rc=0
+
+	local good_path=$1
+	local test_path=$2
+	local column=$3
+
+	cat "$good_path" | awk "{print \$$column;}" >"$good_path.msgs"
+	cat "$test_path" | awk "{print \$$column;}" >"$test_path.msgs"
+
+	diff "$good_path.msgs" "$test_path.msgs" 1>/dev/null
+	# if [ $? -ne 0 ]; then
+	# 	rc=1
+	# fi
+
+	# return $rc
+	return $?
+}
+
+export -f spawn_master spawn_slave spawn test_error_cleanup test_cleanup same_messages
 
 trap error_cleanup EXIT
 
 export tmp_dir=$(mktemp -d)
 export log_dir=$tmp_dir/$date_str/logs
 export meta_log_path=$log_dir/meta.log
-export cangen_common_args="-g 5 -x"
+export cangen_interval_ms=10 # debug
+export cangen_common_args="-g $cangen_interval_ms -x"
 export candump_wait_s=2
-export errors=0
+errors=0
 export slcand_common_args="-f -F -b 4b00"
 # pid_file=$tmp_dir/pids
 
@@ -239,16 +261,18 @@ mkdir -p "$log_dir"
 # slcand -o $slcand_common_args $serial1 &
 # pids+=($!)
 
+set +e
+
 test_name="Single Master sends header, no response"
 echo INFO: Running \"$test_name\" with master=$good_lin slave=$test_lin | tee -a "$meta_log_path"
 $script_dir/hdr-no-response1.sh $good_lin
 rc=$?
+errors=$((errors+rc))
 
 if [ $rc -eq 0 ]; then
 	echo INFO: \"$test_name\" OK! | tee -a "$meta_log_path"
 else
 	echo ERROR: \"$test_name\" FAIL! | tee -a "$meta_log_path"
-	errors=$((errors+1))
 fi
 
 
@@ -274,25 +298,7 @@ fi
 # #-I 42 -L 8 -D i -g 1 -b -n $max_frames
 # single_sender_can_gen_flags="-e -I r -L $frame_len -D i -g 0 -p 1 -b -n $max_frames"
 
-# same_messages()
-# {
-# 	#local rc=0
 
-# 	local good_path=$1
-# 	local test_path=$2
-# 	local column=$3
-
-# 	cat "$good_path" | awk "{print \$$column;}" >"$good_path.msgs"
-# 	cat "$test_path" | awk "{print \$$column;}" >"$test_path.msgs"
-
-# 	diff "$good_path.msgs" "$test_path.msgs" 1>/dev/null
-# 	# if [ $? -ne 0 ]; then
-# 	# 	rc=1
-# 	# fi
-
-# 	# return $rc
-# 	return $?
-# }
 
 
 # # run tests
@@ -377,6 +383,7 @@ fi
 # 		else
 # 			echo INFO: GOOD log file $lines/$error_recovery_tx_frames messages OK! | tee -a "$meta_log_path"
 # 		fi
+
 
 # 		lines=$(cat "$error_recovery_error_passive_log_test_can_rx_path" | wc -l)
 # 		if [ $lines -ne $error_recovery_tx_frames ]; then
