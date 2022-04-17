@@ -119,6 +119,8 @@ fi
 tmp_dir=
 export date_str=$(date +"%F_%H%M%S")
 export pids=()
+export slcand_pids=()
+
 
 
 cleanup()
@@ -148,6 +150,21 @@ error_cleanup()
 
 test_cleanup()
 {
+	for (( i=0; i<${#slcand_pids[@]}; i++ )); do
+		local pid=${slcand_pids[$i]}
+
+		kill -SIGTERM $pid 1>/dev/null 2>&1 || true
+
+		sleep 1
+
+		kill -0 $pid 1>/dev/null 2>&1 || true
+		local running=$?
+
+		if [ $running -ne 0 ]; then
+			kill -SIGKILL $pid 1>/dev/null 2>&1 || true
+		fi
+	done
+
 	for (( i=0; i<${#pids[@]}; i++ )); do
 		local pid=${pids[$i]}
 
@@ -182,7 +199,7 @@ pack_results()
 	mv "$tmp_dir/$tar_file" $PWD
 }
 
-spawn()
+spawn_slcand()
 {
 	local dev=$1
 	local mode=$2
@@ -195,7 +212,7 @@ spawn()
 	echo INFO: Setting up $dev as CAN dev $name | tee -a "$meta_log_path"
 	# echo slcand $mode $slcand_common_args $dev $name
 	slcand $mode $slcand_common_args $dev $name 1>/dev/null 2>&1 &
-	pids+=($!)
+	slcand_pids+=($!)
 
 	# brittle
 	sleep 2
@@ -205,12 +222,12 @@ spawn()
 
 spawn_slave()
 {
-	spawn $1 -l slave
+	spawn_slcand $1 -l slave
 }
 
 spawn_master()
 {
-	spawn $1 -o master
+	spawn_slcand $1 -o master
 }
 
 same_messages()
@@ -233,7 +250,7 @@ same_messages()
 	return $?
 }
 
-export -f spawn_master spawn_slave spawn test_error_cleanup test_cleanup same_messages
+export -f spawn_master spawn_slave spawn_slcand test_error_cleanup test_cleanup same_messages
 
 trap error_cleanup EXIT
 
@@ -245,7 +262,8 @@ export cangen_common_args="-g $cangen_interval_ms -x"
 export candump_wait_s=2
 errors=0
 export slcand_common_args="-f -F -b 4b00"
-# pid_file=$tmp_dir/pids
+alias candump='stdbuf -oL candump'
+
 
 echo INFO: Using tmp dir $tmp_dir
 echo INFO: Test run date $date_str
@@ -253,27 +271,39 @@ echo INFO: Test run date $date_str
 mkdir -p "$log_dir"
 
 
-# echo INFO: Setting up $serial0 as master | tee -a "$meta_log_path"
-# slcand -o $slcand_common_args $serial0 &
-# pids+=($!)
-
-# echo INFO: Setting up $serial1 as slave | tee -a "$meta_log_path"
-# slcand -o $slcand_common_args $serial1 &
-# pids+=($!)
-
 set +e
+lins=($test_lin $good_lin)
 
-test_name="Single Master sends header, no response"
-echo INFO: Running \"$test_name\" with master=$good_lin slave=$test_lin | tee -a "$meta_log_path"
-$script_dir/hdr-no-response1.sh $good_lin
-rc=$?
-errors=$((errors+rc))
+for (( i=0; i<${#lins[@]}; i++ )); do
+	lin=${lins[$i]}
+	test_name="Single Master sends header, no response"
 
-if [ $rc -eq 0 ]; then
-	echo INFO: \"$test_name\" OK! | tee -a "$meta_log_path"
-else
-	echo ERROR: \"$test_name\" FAIL! | tee -a "$meta_log_path"
-fi
+	echo INFO: Running \"$test_name\" with master=$lin | tee -a "$meta_log_path"
+	$script_dir/hdr-no-response1.sh $lin
+	rc=$?
+	errors=$((errors+rc))
+
+	# sleep 1
+
+	# if [ $rc -eq 0 ]; then
+	# 	echo INFO: \"$test_name\" OK! | tee -a "$meta_log_path"
+	# else
+	# 	echo ERROR: \"$test_name\" FAIL! | tee -a "$meta_log_path"
+	# fi
+
+
+done
+
+for (( i=0; i<${#lins[@]}; i++ )); do
+	j=$(expr "($i + 1) % ${#lins[@]}")
+
+	first_lin=${lins[$i]}
+	second_lin=${lins[$j]}
+
+	echo $first_lin $second_lin
+done
+
+
 
 
 

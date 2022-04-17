@@ -15,8 +15,8 @@ trap test_error_cleanup EXIT
 
 lin0_dev_name=$(basename $lin0)
 frame_count=9
-dev_log_file_path=$log_dir/hdr-no-response1_${lin0_dev_name}.log
-expect_log_file_path=$log_dir/hdr-no-response1_expect.log
+dev_log_file_path=$log_dir/hdr-no-response1_actual_${lin0_dev_name}.log
+expect_log_file_path=$log_dir/hdr-no-response1_expect_${lin0_dev_name}.log
 can_dev=master
 errors=0
 
@@ -29,7 +29,7 @@ done
 spawn_master $lin0
 
 
-candump $can_dev,#ffffffff -L >$dev_log_file_path &
+candump $can_dev,#ffffffff -L >$dev_log_file_path 2>/dev/null &
 pids+=($!)
 
 echo INFO: Generating $frame_count headers | tee -a "$meta_log_path"
