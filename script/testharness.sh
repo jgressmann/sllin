@@ -274,26 +274,31 @@ mkdir -p "$log_dir"
 set +e
 lins=($test_lin $good_lin)
 
+
+# Single master tests
+echo INFO: "                                             " | tee -a "$meta_log_path"
+echo INFO: "############## SINGLE MASTER ################" | tee -a "$meta_log_path"
+echo INFO: "                                             " | tee -a "$meta_log_path"
+
 for (( i=0; i<${#lins[@]}; i++ )); do
 	lin=${lins[$i]}
-	test_name="Single Master sends header, no response"
 
+	test_name="master sends header, no response"
 	echo INFO: Running \"$test_name\" with master=$lin | tee -a "$meta_log_path"
 	$script_dir/hdr-no-response1.sh $lin
 	rc=$?
 	errors=$((errors+rc))
 
-	# sleep 1
-
-	# if [ $rc -eq 0 ]; then
-	# 	echo INFO: \"$test_name\" OK! | tee -a "$meta_log_path"
-	# else
-	# 	echo ERROR: \"$test_name\" FAIL! | tee -a "$meta_log_path"
-	# fi
-
-
+	test_name="master tx"
+	echo INFO: Running \"$test_name\" with master=$lin | tee -a "$meta_log_path"
+	$script_dir/master-tx.sh $lin
+	rc=$?
+	errors=$((errors+rc))
 done
 
+echo INFO: "                                             " | tee -a "$meta_log_path"
+echo INFO: "############## MASTER / SLAVE ###############" | tee -a "$meta_log_path"
+echo INFO: "                                             " | tee -a "$meta_log_path"
 for (( i=0; i<${#lins[@]}; i++ )); do
 	j=$(expr "($i + 1) % ${#lins[@]}")
 
