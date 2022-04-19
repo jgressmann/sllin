@@ -26,8 +26,17 @@ candump $lin0_dev_name,#ffffffff -L >$dev_log_file_path 2>/dev/null &
 candump_pid=$!
 pids+=($candump_pid)
 
-echo INFO: Generating set response frames | tee -a "$meta_log_path"
+echo INFO: Setting responses | tee -a "$meta_log_path"
 cangen $cangen_common_args -I i -L i -D i $lin0_dev_name -n $frame_count &
+cangen_pid=$!
+pids+=($cangen_pid)
+
+# brittle
+sleep $candump_wait_s
+friendly_kill $cangen_pid
+
+echo INFO: Clearing responses | tee -a "$meta_log_path"
+cangen $cangen_common_args -I i -L 0 $lin0_dev_name -n $frame_count &
 cangen_pid=$!
 pids+=($cangen_pid)
 
