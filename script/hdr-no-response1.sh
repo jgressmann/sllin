@@ -17,7 +17,6 @@ lin0_dev_name=$(basename $lin0)
 frame_count=63
 dev_log_file_path=$log_dir/hdr-no-response1_actual_${lin0_dev_name}.log
 expect_log_file_path=$log_dir/hdr-no-response1_expect_${lin0_dev_name}.log
-can_dev=master
 errors=0
 
 for i in $(seq 0 $((frame_count-1))); do
@@ -30,11 +29,11 @@ done
 spawn_master $lin0
 
 
-candump $can_dev,#ffffffff -L >$dev_log_file_path 2>/dev/null &
+candump $lin0_dev_name,#ffffffff -L >$dev_log_file_path 2>/dev/null &
 pids+=($!)
 
 echo INFO: Generating $frame_count headers | tee -a "$meta_log_path"
-cangen $cangen_common_args -R -I i -L i $can_dev -n $frame_count &
+cangen $cangen_common_args -R -I i -L i $lin0_dev_name -n $frame_count &
 pids+=($!)
 
 # brittle

@@ -125,12 +125,6 @@ export slcand_pids=()
 
 cleanup()
 {
-	for (( i=0; i<${#pids[@]}; i++ )); do
-		local pid=${pids[$i]}
-
-		kill -9 $pid 1>/dev/null 2>&1
-	done
-
 	if [ ! -z "$tmp_dir" ] && [ -d "$tmp_dir" ]; then
 		echo INFO: Removing $tmp_dir
 		rm -rf "$tmp_dir"
@@ -148,11 +142,17 @@ error_cleanup()
 	cleanup
 }
 
-test_cleanup()
+friendly_kill()
 {
-	for (( i=0; i<${#slcand_pids[@]}; i++ )); do
-		local pid=${slcand_pids[$i]}
+	local pid=$1
 
+	shift
+
+	# friendly request to shut down
+	kill -0 $pid 1>/dev/null 2>&1 || true
+	local running=$?
+
+	if [ $running -eq 0 ]; then
 		kill -SIGTERM $pid 1>/dev/null 2>&1 || true
 
 		sleep 1
@@ -160,9 +160,29 @@ test_cleanup()
 		kill -0 $pid 1>/dev/null 2>&1 || true
 		local running=$?
 
-		if [ $running -ne 0 ]; then
-			kill -SIGKILL $pid 1>/dev/null 2>&1 || true
+		if [ $running -eq 0 ]; then
+			# another friendly request to shut down
+			kill -SIGTERM $pid 1>/dev/null 2>&1 || true
+
+			sleep 1
+
+			kill -0 $pid 1>/dev/null 2>&1 || true
+			running=$?
+
+			if [ $running -eq 0 ]; then
+				# die, die, die
+				kill -SIGKILL $pid 1>/dev/null 2>&1 || true
+			fi
 		fi
+	fi
+}
+
+test_cleanup()
+{
+	for (( i=0; i<${#slcand_pids[@]}; i++ )); do
+		local pid=${slcand_pids[$i]}
+
+		friendly_kill $pid
 	done
 
 	for (( i=0; i<${#pids[@]}; i++ )); do
@@ -203,31 +223,32 @@ spawn_slcand()
 {
 	local dev=$1
 	local mode=$2
-	local name=$3
+	local can_dev_name=$(basename $dev)
 
 	shift
 	shift
-	shift
 
-	echo INFO: Setting up $dev as CAN dev $name | tee -a "$meta_log_path"
+
+	echo INFO: Setting up $dev as CAN dev $can_dev_name | tee -a "$meta_log_path"
 	# echo slcand $mode $slcand_common_args $dev $name
-	slcand $mode $slcand_common_args $dev $name 1>/dev/null 2>&1 &
+	#slcand $mode $slcand_common_args $dev $can_dev_name 1>/dev/null 2>&1 &
+	slcand $mode $slcand_common_args $dev $can_dev_name $@ &
 	slcand_pids+=($!)
 
 	# brittle
 	sleep 2
 
-	ip link set up dev $name
+	ip link set up dev $can_dev_name
 }
 
 spawn_slave()
 {
-	spawn_slcand $1 -l slave
+	spawn_slcand $1 -l $@
 }
 
 spawn_master()
 {
-	spawn_slcand $1 -o master
+	spawn_slcand $1 -o $@
 }
 
 same_messages()
@@ -250,7 +271,7 @@ same_messages()
 	return $?
 }
 
-export -f spawn_master spawn_slave spawn_slcand test_error_cleanup test_cleanup same_messages
+export -f spawn_master spawn_slave spawn_slcand test_error_cleanup test_cleanup same_messages friendly_kill
 
 trap error_cleanup EXIT
 
@@ -274,6 +295,21 @@ mkdir -p "$log_dir"
 set +e
 lins=($test_lin $good_lin)
 
+# Single slave tests
+echo INFO: "                                             " | tee -a "$meta_log_path"
+echo INFO: "############## SINGLE SLAVE #################" | tee -a "$meta_log_path"
+echo INFO: "                                             " | tee -a "$meta_log_path"
+
+for (( i=0; i<${#lins[@]}; i++ )); do
+	lin=${lins[$i]}
+
+	test_name="program slave with responses"
+	echo INFO: Running \"$test_name\" with dev=$lin | tee -a "$meta_log_path"
+	$script_dir/set-response.sh $lin
+	rc=$?
+	errors=$((errors+rc))
+
+done
 
 # Single master tests
 echo INFO: "                                             " | tee -a "$meta_log_path"
@@ -284,13 +320,13 @@ for (( i=0; i<${#lins[@]}; i++ )); do
 	lin=${lins[$i]}
 
 	test_name="master sends header, no response"
-	echo INFO: Running \"$test_name\" with master=$lin | tee -a "$meta_log_path"
+	echo INFO: Running \"$test_name\" with dev=$lin | tee -a "$meta_log_path"
 	$script_dir/hdr-no-response1.sh $lin
 	rc=$?
 	errors=$((errors+rc))
 
 	test_name="master tx"
-	echo INFO: Running \"$test_name\" with master=$lin | tee -a "$meta_log_path"
+	echo INFO: Running \"$test_name\" with dev=$lin | tee -a "$meta_log_path"
 	$script_dir/master-tx.sh $lin
 	rc=$?
 	errors=$((errors+rc))
