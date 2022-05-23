@@ -9,7 +9,7 @@ Supported Devices
 | D5035-50_                                                                                          | `see these steps <README.D5035-50.md>`_                                                                                                                                         |                  |
 +----------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------+
 
-.. _`Adafruit Feather M4 CAN Express`: https://www.adafruit.com/product/3500
+.. _`Adafruit Trinket M0`: https://www.adafruit.com/product/3500
 .. _D5035-50: https://github.com/RudolphRiedel/USB_LIN
 .. _`Pin Setup`: README.Adafruit_Trinket_M0.rst
 
