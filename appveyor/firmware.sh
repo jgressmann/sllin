@@ -77,6 +77,24 @@ for i in $hw_revs; do
 done
 unset hw_revs
 
+
+######################
+# Other Boards (uf2) #
+######################
+
+boards="trinket_m0"
+for board in $boards; do
+	export BOARD=$board
+
+	mkdir -p $TARGET_DIR/sllin/$BOARD
+
+	make $MAKE_ARGS uf2
+
+	cp _build/$BOARD/${project}.uf2 $TARGET_DIR/sllin/$BOARD/
+	rm -rf _build
+done
+
+
 # archive
 cd $TARGET_DIR && (tar c sllin | pixz -9 >sllin-firmware.tar.xz)
 
