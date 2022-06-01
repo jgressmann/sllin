@@ -23,14 +23,16 @@ sudo dfu-util -d 1d50:5037,:5038 -R -D superdfu.dfu
 ```
 
 _NOTE: You likely need to re-flash the LIN application once the bootloader has been updated._
-<!--
+
 ### Windows
 
-Please follow [these steps](../Windows/README.D5035-50.firmware.flashing.md).
+Ensure you have [dfu-util](http://dfu-util.sourceforge.net/releases/) available.
+
+Perform the steps for Linux but omit the `sudo` command.
 
 # Building
 
-This section describes the steps to build the software in a Linux-like environment. Windows users should read [this](../Windows/README.D5035-50.firmware.building.md). -->
+This section describes the steps to build the software in a Linux-like environment. Windows users should read [this](../Windows/README.D5035-50.firmware.building.md).
 
 ## Setup
 
