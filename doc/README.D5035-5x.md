@@ -1,5 +1,5 @@
 
-# D5035-50 Firmware Update
+# D5035-5x Firmware Update
 
 This assumes you have a board with the SuperDFU bootloader already installed. If not, see below on how to build & flash the bootloader.
 
@@ -32,7 +32,7 @@ Perform the steps for Linux but omit the `sudo` command.
 
 # Building
 
-This section describes the steps to build the software in a Linux-like environment. Windows users should read [this](../Windows/README.D5035-50.firmware.building.md).
+This section describes the steps to build the software in a Linux-like environment. Windows users should read [this](../Windows/README.firmware.building.md).
 
 ## Setup
 
@@ -62,6 +62,8 @@ If you have a debugger probe such as SEGGER's J-Link you can choose any option. 
 
 ### 1. Build and flash stand-alone slLIN
 
+*NOTE: this documentation uses D5035-50 as reference, replace with the ID and name of the board you are using.*
+
 #### J-Link
 ```
 $ cd Boards/examples/device/sllin
@@ -79,6 +81,8 @@ $ make -j V=1 BOARD=d5035_50 HWREV=1 flash-edbg
 This creates and flashes the firmware file. Make sure to replace _HWREV=1_ with the version of the board you are using.
 
 ### 2. Build and flash slLIN and SuperDFU (bootloader)
+
+*NOTE: this documentation uses D5035-50 as reference, replace with the ID and name of the board you are using.*
 
 #### Prequisites
 
@@ -140,5 +144,5 @@ Ensure _HWREV_ matches the board you are using.
 Next, upload the DFU file to the board.
 ```
 $ cd Boards/examples/device/sllin
-$ sudo dfu-util -R -D _build/d5035_50/sllin.dfu
+$ make -j V=1 BOARD=d5035_50 HWREV=1 APP=1 dfu-upload
 ```
