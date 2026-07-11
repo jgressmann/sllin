@@ -23,7 +23,7 @@ deploy:
     prerelease: true
     force_update: true
     auth_token:
-      secure: bKQ2RgyJSqBdrQV8TFJ/1oSxxUH2tEPbpiXiwDYI+Adf1rw3aqGBnUp6jtVmnsbbQuX5XvPIl23pXiWRuhxIm7PycgMKU0nHWg5DAt3ftGw71rLl5xv6mgLLoHU
+      secure: w0WvJ+J8wm9BVj4E7zODb6NABBHzq2OCje/TqT/mOO+EVFmHpBU+kXmOxehwPbG1
     on:
       branch: main                # release from main branch only
 
@@ -35,7 +35,7 @@ deploy:
     prerelease: false
     force_update: true
     auth_token:
-      secure: bKQ2RgyJSqBdrQV8TFJ/1oSxxUH2tEPbpiXiwDYI+Adf1rw3aqGBnUp6jtVmnsbbQuX5XvPIl23pXiWRuhxIm7PycgMKU0nHWg5DAt3ftGw71rLl5xv6mgLLoHU
+      secure: w0WvJ+J8wm9BVj4E7zODb6NABBHzq2OCje/TqT/mOO+EVFmHpBU+kXmOxehwPbG1
     on:
       APPVEYOR_REPO_TAG: true       # deploy on tag push only
 
