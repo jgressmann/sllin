@@ -8,7 +8,7 @@ clone_depth: 1
 
 build_script:
   - #chmod +x appveyor/firmware.sh && ./appveyor/firmware.sh
-  - touch sllin-firmware.tar.xz
+  - echo "I am the void" >sllin-firmware.tar.xz
 
 artifacts:
   - path: sllin-firmware.tar.xz
